@@ -1,0 +1,27 @@
+- name: Crear volumen para MongoDB
+  community.docker.docker_volume:
+    name: mongodb_data
+
+- name: Copiar archivo de inicialización de MongoDB
+  ansible.builtin.copy:
+    src: init-mongo.js
+    dest: /tmp/init-mongo.js
+
+- name: Crear contenedor Docker de MongoDB
+  community.docker.docker_container:
+    name: mongodb-master
+    image: mongodb/mongodb-community-server:latest
+    detach: true
+    hostname: mongo
+    auto_remove: false
+    restart_policy: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - /tmp/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    env:
+      MONGO_INITDB_ROOT_USERNAME: root 
+      MONGO_INITDB_ROOT_PASSWORD: root 
+      GLIBC_TUNABLES=glibc.pthread.rseq=0
+

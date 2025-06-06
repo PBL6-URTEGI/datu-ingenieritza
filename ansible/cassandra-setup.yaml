@@ -1,0 +1,8 @@
+---
+- name: Cassandra Install
+  hosts: cassandra
+  remote_user: root 
+  roles:
+  - cassandra-setup 
+  - cassandra-start 
+

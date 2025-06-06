@@ -1,0 +1,195 @@
+---
+- name: Update & Configure Kafka LXC
+  hosts: all
+  become: true
+
+  vars:
+    gdrive_file_id: "1t98cDnRNB5JBl5PYmYBD6PtdRoD8I15L"
+
+  tasks:
+
+    # --- ACTUALIZACIÓN DEL SISTEMA ---
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install unzip and wget
+      apt:
+        name:
+          - unzip
+          - wget
+          - nano
+        state: present
+
+    # --- DESCARGA Y DESCOMPRESIÓN DE SCRIPTS ---
+    - name: Download scripts.zip from Google Drive
+      get_url:
+        url: "https://drive.google.com/uc?export=download&id={{ gdrive_file_id }}"
+        dest: /tmp/scripts.zip
+
+    - name: Ensure /root/scripts directory exists
+      file:
+        path: /root/scripts
+        state: directory
+        mode: '0755'
+
+    - name: Unzip scripts.zip into /root/scripts/
+      unarchive:
+        src: /tmp/scripts.zip
+        dest: /root/scripts
+        remote_src: yes
+
+    - name: Remove scripts.zip after extraction
+      file:
+        path: /tmp/scripts.zip
+        state: absent
+
+    - name: List contents of /root/scripts recursively (debug)
+      command: ls -lR /root/scripts
+      register: unzip_output
+
+    - name: Mostrar resultado del ls
+      debug:
+        var: unzip_output.stdout
+
+    - name: Make all files in /root/scripts/scripts executable
+      file:
+        path: "/root/scripts/scripts/{{ item }}"
+        mode: '0755'
+      loop:
+        - run_all.sh
+        - create_users_groups.sh
+        - enforce_password.sh
+        - secure_ssh.sh
+      when: unzip_output.stdout is search("scripts/")
+
+    - name: Run main script
+      command: /root/scripts/scripts/run_all.sh
+
+    - name: Cleanup apt cache after scripts
+      apt:
+        autoclean: yes
+        autoremove: yes
+        update_cache: no
+
+    # --- INSTALACIÓN DE DOCKER ---
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Add Docker’s official GPG key
+      shell: |
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker apt repository
+      shell: |
+        echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+        $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+      args:
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Update apt after adding Docker repo
+      apt:
+        update_cache: yes
+
+    - name: Install Docker Engine
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Cleanup apt cache after Docker installation
+      apt:
+        autoclean: yes
+        autoremove: yes
+        update_cache: no
+
+    # --- DESPLIEGUE DE KAFKA CON DOCKER COMPOSE ---
+    - name: Create Docker app directory
+      file:
+        path: /opt/kafka-docker
+        state: directory
+        mode: '0755'
+
+    - name: Pull Apache Kafka image
+      community.docker.docker_image:
+        name: apache/kafka
+        tag: "4.0.0"
+        source: pull
+
+    - name: Run Apache Kafka container
+      community.docker.docker_container:
+        name: kafka
+        image: apache/kafka:4.0.0
+        ports:
+          - "9092:9092"
+        restart_policy: always
+      become: true
+
+    - name: Final cleanup - remove any leftover temp files (ignore errors)
+      file:
+        path: "{{ item }}"
+        state: absent
+        force: yes
+      loop:
+        - /tmp/scripts.zip
+      ignore_errors: yes
+
+    - name: Final apt cleanup
+      apt:
+        autoclean: yes
+        autoremove: yes
+        update_cache: no
+
+    - name: Crear topic Kafka "datos_kafka"
+      command: >
+        docker exec kafka /opt/kafka/bin/kafka-topics.sh
+        --create
+        --bootstrap-server localhost:9092
+        --replication-factor 1
+        --partitions 1
+        --topic stream_zona1
+
+    # --- DESPLIEGA JAVA + MAVEN DIRECTAMENTE EN EL LXC ---
+
+    - name: Instalar JDK, Maven y Git en el LXC
+      apt:
+        name:
+          - openjdk-17-jdk
+          - maven
+          - git
+        state: present
+        update_cache: yes
+
+    - name: Crear directorio del proyecto Java
+      file:
+        path: /opt/Sistema-Konkurrente-eta-banatuak
+        state: directory
+        mode: '0755'
+
+    - name: Clonar repositorio del proyecto Java
+      git:
+        repo: https://github.com/PBL6-URTEGI/Sistema-Konkurrente-eta-banatuak.git
+        dest: /opt/Sistema-Konkurrente-eta-banatuak
+        version: main
+        force: yes

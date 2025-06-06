@@ -1,0 +1,10 @@
+---
+- name: Install Nginx
+  community.docker.docker_container:
+    name: nginx
+    image: nginx
+    detach: True
+    ports:
+        - 80:80
+    expose:
+        - 80

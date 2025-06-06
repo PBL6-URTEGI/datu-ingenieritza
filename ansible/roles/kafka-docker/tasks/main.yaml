@@ -1,0 +1,69 @@
+    - name: Create Docker app directory
+      file:
+        path: /opt/kafka-docker
+        state: directory
+        mode: '0755'
+
+    - name: Pull Apache Kafka image
+      community.docker.docker_image:
+        name: apache/kafka
+        tag: "4.0.0"
+        source: pull
+
+    - name: Run Apache Kafka container
+      community.docker.docker_container:
+        name: kafka
+        image: apache/kafka:4.0.0
+        ports:
+          - "9092:9092"
+        restart_policy: always
+      become: true
+
+    - name: Final cleanup - remove any leftover temp files (ignore errors)
+      file:
+        path: "{{ item }}"
+        state: absent
+        force: yes
+      loop:
+        - /tmp/scripts.zip
+      ignore_errors: yes
+
+    - name: Final apt cleanup
+      apt:
+        autoclean: yes
+        autoremove: yes
+        update_cache: no
+
+    - name: Crear topic Kafka "datos_kafka"
+      command: >
+        docker exec kafka /opt/kafka/bin/kafka-topics.sh
+        --create
+        --bootstrap-server localhost:9092
+        --replication-factor 1
+        --partitions 1
+        --topic stream_zona1
+
+    # --- DESPLIEGA JAVA + MAVEN DIRECTAMENTE EN EL LXC ---
+
+    - name: Instalar JDK, Maven y Git en el LXC
+      apt:
+        name:
+          - openjdk-17-jdk
+          - maven
+          - git
+        state: present
+        update_cache: yes
+
+    - name: Crear directorio del proyecto Java
+      file:
+        path: /opt/Sistema-Konkurrente-eta-banatuak
+        state: directory
+        mode: '0755'
+
+    - name: Clonar repositorio del proyecto Java
+      git:
+        repo: https://github.com/PBL6-URTEGI/Sistema-Konkurrente-eta-banatuak.git
+        dest: /opt/Sistema-Konkurrente-eta-banatuak
+        version: main
+        force: yes
+

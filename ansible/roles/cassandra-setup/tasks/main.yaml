@@ -1,0 +1,18 @@
+- name: Ensure /etc/cassandra directory exists
+  become: yes
+  file:
+    path: /etc/cassandra
+    state: directory
+    mode: '0755'
+- name: Copy cassandra.yaml to the remote node
+  become: yes
+  copy:
+    src: ../files/cassandra.yaml
+    dest: /etc/cassandra/cassandra.yaml
+- name: Set permissions and ownership for cassandra.yaml
+  become: yes
+  ansible.builtin.file:
+    path: /etc/cassandra/cassandra.yaml
+    mode: '0666'
+    owner: 999
+    group: root

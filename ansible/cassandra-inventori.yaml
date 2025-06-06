@@ -1,0 +1,5 @@
+[cassandra]
+cassandra1 ansible_host=10.0.2.70
+cassandra2 ansible_host=10.0.2.71
+cassandra3 ansible_host=10.0.2.72
+

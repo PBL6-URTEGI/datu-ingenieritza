@@ -1,0 +1,8 @@
+---
+- name: Docker Install
+  hosts: all
+  remote_user: root
+  roles:
+  - system-upgrade
+  - install-docker
+  - proba-docker

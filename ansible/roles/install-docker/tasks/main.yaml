@@ -1,0 +1,39 @@
+---
+- name: Install required packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg
+- name: Add Docker GPG key
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+- name: Add Docker APT repository
+  become: yes
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+- name: Install Docker
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+- name: Ensure Docker service is running
+  become: yes
+  service:
+    name: docker
+    state: started
+    enabled: yes
+

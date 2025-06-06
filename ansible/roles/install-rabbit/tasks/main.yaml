@@ -1,0 +1,11 @@
+- name: Create a rabbit  Docker container
+  community.docker.docker_container:
+    name: rabbit 
+    image: rabbitmq:3-management
+    detach: true
+    hostname: "rabbit"
+    auto_remove: false
+    ports:
+      - 15672:15672
+      - 5672:5672
+
