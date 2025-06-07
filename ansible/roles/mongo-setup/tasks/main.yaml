@@ -1,0 +1,12 @@
+- name: Crear volumen para MongoDB
+  community.docker.docker_volume:
+    name: mongodb_data
+- name: Copiar archivo de inicialización de MongoDB
+  ansible.builtin.copy:
+    src: ../files/init-mongo.js
+    dest: /tmp/init-mongo.js
+- name: Copiar archivo keyFile para replica set
+  ansible.builtin.copy:
+    src: ../files/mongo-keyfile
+    dest: /tmp/mongo-keyfile
+    mode: '0400'

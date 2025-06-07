@@ -1,13 +1,15 @@
 ---
-- name: mongo Install master
-  hosts: master
-  remote_user: root
-  roles:
-  - mongo-master 
-
 - name: mongo Install slave
   hosts: slave
   remote_user: root
   roles:
-  - mongo-slave
+    - mongo-setup
+    - mongo-slave
+
+- name: mongo Install master
+  hosts: master
+  remote_user: root
+  roles:
+    - mongo-setup
+    - mongo-master 
 
