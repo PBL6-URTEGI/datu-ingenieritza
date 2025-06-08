@@ -1,0 +1,56 @@
+---
+- name: Install unzip and wget
+  apt:
+    name:
+      - unzip
+      - wget
+    state: present
+- name: Download scripts.zip from Google Drive
+  get_url:
+    url: "https://drive.google.com/uc?export=download&id=1t98cDnRNB5JBl5PYmYBD6PtdRoD8I15L"
+    dest: /tmp/scripts.zip
+
+- name: Ensure /root/scripts directory exists
+  file:
+    path: /root/scripts
+    state: directory
+    mode: '0755'
+
+- name: Unzip scripts.zip into /root/scripts/
+  unarchive:
+    src: /tmp/scripts.zip
+    dest: /root/scripts
+    remote_src: yes
+
+- name: Remove scripts.zip after extraction
+  file:
+    path: /tmp/scripts.zip
+    state: absent
+
+- name: List contents of /root/scripts recursively (debug)
+  command: ls -lR /root/scripts
+  register: unzip_output
+
+- name: Mostrar resultado del ls
+  debug:
+    var: unzip_output.stdout
+
+- name: Make all files in /root/scripts/scripts executable
+  file:
+    path: "/root/scripts/scripts/{{ item }}"
+    mode: '0755'
+  loop:
+    - run_all.sh
+    - create_users_groups.sh
+    - enforce_password.sh
+    - secure_ssh.sh
+  when: unzip_output.stdout is search("scripts/")
+
+- name: Run main script
+  command: /root/scripts/scripts/run_all.sh
+
+- name: Cleanup apt cache after scripts
+  apt:
+    autoclean: yes
+    autoremove: yes
+    update_cache: no
