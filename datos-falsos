@@ -3,12 +3,8 @@
 # 1. Instalar dependencias
 apt update
 apt install -y python3-venv python3-full
-
-# 2. Crear entorno virtual
 python3 -m venv venv
 source venv/bin/activate
-
-# 3. Instalar pymongo
 pip install pymongo
 
 # 4. Crear el archivo insertar_datos.py

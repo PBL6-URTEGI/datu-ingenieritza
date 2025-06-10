@@ -1,0 +1,11 @@
+- name: Copy CQL file to container
+  ansible.builtin.copy:
+    src: ../files/cassandra_setup.cql
+    dest: /tmp/cassandra_setup.cql
+
+- name: Copy CQL script into container
+  command: docker cp /tmp/cassandra_setup.cql cassandra-cluster:/tmp/cassandra_setup.cql
+
+- name: Execute CQL script inside container
+  command: docker exec cassandra-cluster cqlsh -u cassandra -p cassandra -f /tmp/cassandra_setup.cql
+

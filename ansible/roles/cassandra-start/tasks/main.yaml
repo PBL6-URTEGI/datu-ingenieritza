@@ -3,7 +3,7 @@
     cassandra_seeds: "{{ groups['cassandra'] | map('extract', hostvars, ['ansible_host']) | list | join(',') }}"
 - name: Create a Cassandra Docker container
   community.docker.docker_container:
-    name: cassandra-mielda
+    name: cassandra-cluster
     image: cassandra:latest
     detach: true
     hostname: "cassandra"

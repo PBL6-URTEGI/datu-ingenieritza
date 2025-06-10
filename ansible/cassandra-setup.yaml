@@ -5,4 +5,5 @@
   roles:
   - cassandra-setup 
   - cassandra-start 
+  - cassandra-table 
 
