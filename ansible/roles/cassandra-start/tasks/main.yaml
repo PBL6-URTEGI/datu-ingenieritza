@@ -7,7 +7,6 @@
     image: cassandra:latest
     detach: true
     hostname: "cassandra"
-    auto_remove: false
     ports:
       - 7000:7000
       - 7001:7001

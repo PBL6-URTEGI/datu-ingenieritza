@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# 1. Instalar dependencias
+apt update
+apt install -y python3-venv python3-full
+
+# 2. Crear entorno virtual
+python3 -m venv venv
+source venv/bin/activate
+
+# 3. Instalar pymongo
+pip install pymongo
+
+# 4. Crear el archivo insertar_datos.py
+cat <<EOF > insertar_datos.py
+from pymongo import MongoClient
+from datetime import datetime, timedelta
+import random
+
+# Conexión a MongoDB con autenticación
+client = MongoClient("mongodb://root:root@localhost:27017/?authSource=admin")
+db = client["mi_base_de_datos"]
+collection = db["mi_coleccion"]
+
+# Estaciones simuladas
+estaciones = [str(i) for i in range(1, 6)]  # IDs: "1" a "5"
+
+# Función para generar un dato
+def generar_dato(id_estacion, timestamp):
+    return {
+        "id_estacion": id_estacion,
+        "caudal_rio": round(random.uniform(0.1, 5.0), 6),
+        "nivel_rio": round(random.uniform(0.1, 2.0), 6),
+        "precipitacion": round(random.uniform(0.0, 20.0), 2),
+        "temperatura": round(random.uniform(10.0, 35.0), 2),
+        "temperatura_agua": None,
+        "nivel_embalse": None,
+        "nivel_embalse_visor": None,
+        "porcentaje_llenado_embalse": None,
+        "porcentaje_llenado_embalse_visor": None,
+        "volumen_embalse": None,
+        "volumen_embalse_visor": None,
+        "timestamp": timestamp.isoformat() + "Z"
+    }
+
+# Generar datos
+inicio = datetime(2025, 6, 4, 0, 0)
+datos = []
+
+for estacion in estaciones:
+    for i in range(100):
+        tiempo = inicio + timedelta(minutes=15 * i)
+        datos.append(generar_dato(estacion, tiempo))
+
+collection.insert_many(datos)
+print(f"Se insertaron {len(datos)} documentos.")
+EOF
+
+# 5. Ejecutar el script Python
+python insertar_datos.py

@@ -11,7 +11,6 @@ terraform {
 
 // Providers for each Proxmox VE host
 provider "proxmox" {
-  alias = "tail1"
   pm_tls_insecure = true
   pm_api_url      = "https://${var.pm_api_host}:${var.pm_api_port}/${var.pm_api_version}/${var.pm_api_format}"
   pm_password     = var.pm_api_password
@@ -23,11 +22,7 @@ provider "proxmox" {
 // ——————————————————————————————————————————————————————————
 
 resource "proxmox_lxc" "singlesc" {
-
-  provider = proxmox.tail1
-
   target_node  = var.pm_node
-  vmid         = var.pm_ct_vmid
   ostemplate   = var.pm_ct_template
   cores        = var.pm_ct_cores
   memory       = var.pm_ct_memory_mb
@@ -53,18 +48,21 @@ resource "proxmox_lxc" "singlesc" {
   features {
     nesting = true
   }
+  provisioner "local-exec" {
+    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/docker-install.yaml -vvv"
+  }
 }
 // ——————————————————————————————————————————————————————————
 // Hacer APT update
 // ——————————————————————————————————————————————————————————
 
 
-resource "null_resource" "ansible_install_docker" {
-  depends_on = [
-    proxmox_lxc.singlesc
-  ]
-
-  provisioner "local-exec" {
-    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/probak.yaml -vvv"
-  }
-}
+//resource "null_resource" "ansible_install_docker" {
+//  depends_on = [
+//    proxmox_lxc.singlesc
+//  ]
+//
+//  provisioner "local-exec" {
+//    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/nifi-docker.yaml -vvv"
+//  }
+//}

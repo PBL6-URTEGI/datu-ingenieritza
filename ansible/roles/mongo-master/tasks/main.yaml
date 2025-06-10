@@ -8,12 +8,12 @@
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - /tmp/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - /tmp/init-mongo:/docker-entrypoint-initdb.d
       - /tmp/mongo-keyfile:/data/configdb/mongo-keyfile
     env:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-    command: --replSet myReplicaSet --keyFile /data/configdb/mongo-keyfile --bind_ip_all
+    command: --replSet myReplicaSet --keyFile /data/configdb/mongo-keyfile/mongo-keyfile.txt --bind_ip_all
 - name: Esperar a que MongoDB esté disponible
   ansible.builtin.wait_for:
     host: 10.0.2.80

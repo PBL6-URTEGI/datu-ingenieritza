@@ -18,6 +18,7 @@ pm_api_password                 = "popbl6kafka1"
 ########
 pm_node                          = "proxmox1"
 pm_nodes    = ["kafka1","kafka2","kafka3"]
+//pm_nodes    = ["kafka1"]
 ###########
 # Network #
 ###########

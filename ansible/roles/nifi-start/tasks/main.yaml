@@ -1,0 +1,11 @@
+- name: Create a nifi Docker container
+  community.docker.docker_container:
+    name: nifi-docker
+    image: apache/nifi:latest
+    detach: true
+    hostname: "nifi"
+    ports:
+      - 8443:8443
+    env:
+      SINGLE_USER_CREDENTIALS_USERNAME: root 
+      SINGLE_USER_CREDENTIALS_PASSWORD: root

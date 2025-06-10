@@ -1,4 +1,5 @@
 kredentzialak/
 **/.terraform/
-*.tfstate
-*.tfstate.*
+.terraform.tfstate*
+*tfstate*
+.terraform.*

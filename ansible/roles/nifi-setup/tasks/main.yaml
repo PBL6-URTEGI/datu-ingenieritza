@@ -1,0 +1,17 @@
+- name: Crear el directorio /tmp/mongo-keyfile si no existe
+  ansible.builtin.file:
+    path: /tmp/nifi-drivers
+    state: directory
+    mode: '0755'
+- name: Copiar archivo de inicialización de MongoDB
+  ansible.builtin.copy:
+    src: ../files/mysql-connector-j-9.3.0.jar
+    dest: /tmp/nifi-drivers/mysql-connector-j-9.3.0.jar
+- name: Copiar archivo de inicialización de MongoDB
+  ansible.builtin.copy:
+    src: ../files/postgresql-42.4.0.jar
+    dest: /tmp/nifi-drivers/postgresql-42.4.0.jar
+- name: Copiar archivo de inicialización de MongoDB
+  ansible.builtin.copy:
+    src: ../files/protobuf-java-4.29.0.jar
+    dest: /tmp/nifi-drivers/protobuf-java-4.29.0.jar
