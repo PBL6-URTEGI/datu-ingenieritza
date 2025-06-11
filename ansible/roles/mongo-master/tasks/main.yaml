@@ -35,8 +35,6 @@
       _id: "myReplicaSet",
       members: [
         { _id: 0, host: "10.0.2.80:27017" },
-        { _id: 1, host: "10.0.2.81:27017" },
-        { _id: 2, host: "10.0.2.82:27017" }
       ]
     })'
   when: inventory_hostname == "10.0.2.80"

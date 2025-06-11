@@ -2,7 +2,9 @@
   ansible.builtin.copy:
     src: ../files/cassandra_setup.cql
     dest: /tmp/cassandra_setup.cql
-
+- name: Wait for Cassandra to fully start up
+  pause:
+    seconds: 30
 - name: Copy CQL script into container
   command: docker cp /tmp/cassandra_setup.cql cassandra-cluster:/tmp/cassandra_setup.cql
 
