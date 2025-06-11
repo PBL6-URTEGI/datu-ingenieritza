@@ -1,0 +1,44 @@
+
+- name: Install debconf-utils
+  become: yes
+  apt:
+    name: debconf-utils
+    state: present
+
+- name: Set Tripwire passphrase for Debconf
+  become: yes
+  debconf:
+    name: tripwire
+    question: tripwire/local-passphrase
+    value: bombardeenapache
+    vtype: password
+
+- name: Confirm Tripwire passphrase for Debconf
+  become: yes
+  debconf:
+    name: tripwire
+    question: tripwire/local-passphrase-again
+    value: bombardeenapache
+    vtype: password
+
+- name: Set Tripwire site key passphrase for Debconf
+  become: yes
+  debconf:
+    name: tripwire
+    question: tripwire/site-passphrase
+    value: bombardeenapache
+    vtype: password
+
+- name: Confirm Tripwire site key passphrase for Debconf
+  become: yes
+  debconf:
+    name: tripwire
+    question: tripwire/site-passphrase-again
+    value: bombardeenapache
+    vtype: password
+
+- name: Install Tripwire
+  become: yes
+  apt:
+    name: tripwire
+    state: present

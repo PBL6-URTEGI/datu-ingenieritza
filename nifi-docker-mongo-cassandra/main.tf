@@ -63,6 +63,6 @@ resource "proxmox_lxc" "singlesc" {
 //  ]
 //
 //  provisioner "local-exec" {
-//    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/nifi-docker.yaml -vvv"
+//    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/nifi-docker-mongo-cassandra.yaml -vvv"
 //  }
 //}

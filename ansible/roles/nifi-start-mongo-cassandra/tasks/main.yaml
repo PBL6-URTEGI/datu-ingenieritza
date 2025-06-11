@@ -1,7 +1,7 @@
 - name: Create a nifi Docker container
   community.docker.docker_container:
     name: nifi-docker
-    image: apache/nifi:latest
+    image: apache/nifi:1.17.0
     detach: true
     hostname: "nifi"
     ports:

@@ -1,0 +1,7 @@
+---
+- name: rabbit Install
+  hosts: all
+  remote_user: root
+  roles:
+  - system-upgrade
+  - zabbix-install 
