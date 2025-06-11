@@ -1,0 +1,3 @@
+---
+tailscale_auth_key: "tskey-auth-kt5WqoeXB721CNTRL-27ZxPDy6RMhjLCAsMftSLhdSrua6JcpQ"
+tailscale_advertise_routes: "10.0.2.10/24"

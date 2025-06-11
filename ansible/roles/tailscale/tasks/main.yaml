@@ -1,0 +1,65 @@
+    # --- DESPLIEGA TAILSCALE DIRECTAMENTE EN EL LXC ---
+---
+- name: Instalar curl
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
+
+- name: Asegurar net.ipv4.ip_forward en sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: "net.ipv4.ip_forward = 1"
+    state: present
+
+- name: Asegurar net.ipv6.conf.all.forwarding en sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: "net.ipv6.conf.all.forwarding = 1"
+    state: present
+
+- name: Aplicar configuración sysctl
+  command: sysctl -p /etc/sysctl.conf
+  register: sysctl_apply
+  changed_when: "'net.ipv4.ip_forward = 1' in sysctl_apply.stdout"
+
+- name: Reiniciar servicio networking
+  service:
+    name: networking
+    state: restarted
+
+- name: Instalar tailscale con script oficial
+  shell: curl -fsSL https://tailscale.com/install.sh | sh
+  args:
+    creates: /usr/sbin/tailscaled
+
+- name: Arrancar servicio tailscaled
+  service:
+    name: tailscaled
+    state: started
+    enabled: yes
+
+- name: Ejecutar tailscale up
+  shell: >
+    tailscale up --accept-routes
+    --authkey {{ tailscale_auth_key }}
+    --advertise-routes 10.0.2.10/24
+  args:
+    creates: /var/lib/tailscale/tailscaled.state
+
+- name: Arrancar servicio tailscaled
+  service:
+    name: tailscaled
+    state: started
+    enabled: yes
+
+- name: Ejecutar tailscale up con parámetros
+  command: >
+    tailscale up
+    --accept-routes
+    --authkey {{ tailscale_auth_key }}
+    --advertise-routes {{ tailscale_advertise_routes }}
+  args:
+    creates: /var/lib/tailscale/tailscaled.state
+  register: tailscale_up
+  changed_when: tailscale_up.rc == 0

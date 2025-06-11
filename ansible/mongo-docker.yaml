@@ -11,5 +11,6 @@
   remote_user: root
   roles:
     - mongo-setup
-    - mongo-master 
+    - mongo-master
+    - mongo-kafka
 
