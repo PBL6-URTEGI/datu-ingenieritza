@@ -1,4 +1,3 @@
-kredentzialak/
 **/.terraform/
 .terraform.tfstate*
 *tfstate*
