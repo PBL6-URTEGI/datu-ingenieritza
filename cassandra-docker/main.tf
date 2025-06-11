@@ -64,3 +64,12 @@ resource "null_resource" "cassandra-docker" {
     command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ../ansible/cassandra-inventori.yaml ../ansible/cassandra-setup.yaml -vvv"
   }
 }
+resource "null_resource" "security" {
+  depends_on = [
+    null_resource.cassandra-docker
+  ]
+
+  provisioner "local-exec" {
+    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 181)}, ../ansible/security.yaml -vvv"
+  }
+}

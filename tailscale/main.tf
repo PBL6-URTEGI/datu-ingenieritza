@@ -27,7 +27,6 @@ resource "proxmox_lxc" "singlesctail_proba" {
   provider = proxmox.tail1
 
   target_node  = var.pm_nodetail_proba
-  vmid         = var.pm_ct_vmidtail_proba
   ostemplate   = var.pm_ct_templatetail_proba
   cores        = var.pm_ct_corestail_proba
   memory       = var.pm_ct_memory_mbtail_proba

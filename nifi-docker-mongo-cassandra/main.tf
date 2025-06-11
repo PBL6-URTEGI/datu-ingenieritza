@@ -57,12 +57,21 @@ resource "proxmox_lxc" "singlesc" {
 // ——————————————————————————————————————————————————————————
 
 
-//resource "null_resource" "ansible_install_docker" {
-//  depends_on = [
-//    proxmox_lxc.singlesc
-//  ]
-//
-//  provisioner "local-exec" {
-//    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/nifi-docker-mongo-cassandra.yaml -vvv"
-//  }
-//}
+resource "null_resource" "ansible_install_docker" {
+  depends_on = [
+    proxmox_lxc.singlesc
+  ]
+
+  provisioner "local-exec" {
+    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 180)}, ../ansible/nifi-docker-mongo-cassandra.yaml -vvv"
+  }
+}
+resource "null_resource" "security" {
+  depends_on = [
+null_resource.ansible_install_docker
+  ]
+
+  provisioner "local-exec" {
+    command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 181)}, ../ansible/security.yaml -vvv"
+  }
+}
