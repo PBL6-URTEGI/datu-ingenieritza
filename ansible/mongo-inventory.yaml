@@ -3,7 +3,4 @@ all:
     master:
       hosts:
         10.0.2.80:
-    slave:
-      hosts:
-        10.0.2.81:
-        10.0.2.82:
+
