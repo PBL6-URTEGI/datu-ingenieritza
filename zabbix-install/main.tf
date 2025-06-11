@@ -59,7 +59,7 @@ resource "proxmox_lxc" "singlesc" {
 
 
 
-resource "null_resource" "tripwire" {
+resource "null_resource" "security" {
   depends_on = [
     null_resource.security
   ]
@@ -68,7 +68,7 @@ resource "null_resource" "tripwire" {
     command = "ANSIBLE_CONFIG=../ansible/ansible.cfg ansible-playbook -e 'ansible_ssh_private_key_file=../kredentzialak/gakoa' -i ${cidrhost(var.pm_ct_network_subnet, 181)}, ../ansible/tripwire.yaml -vvv"
   }
 }
-resource "null_resource" "security" {
+resource "null_resource" "tripwire" {
   depends_on = [
     proxmox_lxc.singlesc
   ]

@@ -1,4 +1,6 @@
-
+- name: Wait for Cassandra to fully start up
+  pause:
+    seconds: 30
 - name: Install debconf-utils
   become: yes
   apt:
@@ -36,9 +38,20 @@
     question: tripwire/site-passphrase-again
     value: bombardeenapache
     vtype: password
-
+- name: Wait for Cassandra to fully start up
+  pause:
+    seconds: 30
 - name: Install Tripwire
   become: yes
   apt:
     name: tripwire
     state: present
+- name: Initialize Tripwire with expect
+  become: yes
+  expect:
+    command: tripwire --init
+    responses:
+      "Please enter your site passphrase:": "bombardeenapache"
+      "Please enter your local passphrase:": "bombardeenapache"
+  args:
+    creates: /var/lib/tripwire/*.twd
