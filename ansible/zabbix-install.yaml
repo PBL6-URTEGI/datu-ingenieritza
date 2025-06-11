@@ -5,3 +5,4 @@
   roles:
   - system-upgrade
   - zabbix-install 
+  - security 

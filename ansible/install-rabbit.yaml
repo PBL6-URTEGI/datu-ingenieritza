@@ -4,3 +4,4 @@
   remote_user: root
   roles:
   - install-rabbit
+  - security 

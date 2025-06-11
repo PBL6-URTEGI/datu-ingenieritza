@@ -5,6 +5,7 @@
   roles:
     - mongo-setup
     - mongo-slave
+    - security 
 
 - name: mongo Install master
   hosts: master
@@ -13,4 +14,5 @@
     - mongo-setup
     - mongo-master
     - mongo-kafka
+    - security 
 
